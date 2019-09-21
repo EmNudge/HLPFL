@@ -8,3 +8,9 @@ Thumbs.db
 # Python
 __pycache__
 venv
+
+# Logs
+log.txt
+
+# GCloud
+credentials.json
