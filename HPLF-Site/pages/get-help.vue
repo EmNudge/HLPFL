@@ -9,7 +9,7 @@
     <div class="messages">
 
     </div>
-    <VoiceInput />
+    <VoiceInput :isActive="isActive" @click="() => isActive = !isActive" />
   </div>
 </template>
 
@@ -17,6 +17,11 @@
 import VoiceInput from '~/components/VoiceInput.vue'
 
 export default {
+  data() {
+    return { 
+      isActive: false,
+    }
+  },
   components: {
     VoiceInput
   }
