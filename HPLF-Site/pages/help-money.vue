@@ -10,11 +10,14 @@ import Button from '~/components/Button.vue'
 
 export default {
   components: {
-    Button
+    Button,
+    Header
   }
 }
 </script>
 
 <style lang="scss">
-  
+  header {
+    
+  }
 </style>

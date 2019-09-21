@@ -8,7 +8,7 @@
       <p>Persevere.</p>
     </div>
     <div class="buttons">
-      <Button text="Help" />
+      <Button text="Help" href="/help-money" />
       <Button text="Get Help" href="/get-help" />
     </div>
   </div>

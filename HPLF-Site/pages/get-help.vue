@@ -12,7 +12,7 @@
         :botMsgs="botMsgs"
       />
     </div>
-    {{msg}}
+    
     <div class="input-container">
       <VoiceInput 
         v-model="userInput"
@@ -77,10 +77,10 @@ export default {
     }
   },
   async asyncData({req}) {
-    // const url = `${req.protocol}://${req.get('host')}`;
-    // const jsonData = await fetch(url + '/api/v1/credentials');
-    // const { serviceUrl, token } = await jsonData.json();
-    // return { token }
+    const url = `${req.protocol}://${req.get('host')}`;
+    const jsonData = await fetch(url + '/api/v1/credentials');
+    const { serviceUrl, token } = await jsonData.json();
+    return { token }
   },
   computed: {
     botMsgs() {
