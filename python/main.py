@@ -4,11 +4,17 @@ from google.cloud import language_v1
 from google.cloud.language_v1 import enums
 
 
-def parse_input(real_disaster, real_location, real_date, real_reports):
+def _parse_input(annotations):
+    annotations["di"]
+
     real_disaster = real_disaster.lower()
     real_location = real_location.lower()
     real_date = real_date.split("-")
     return real_disaster, real_location, real_date, real_reports
+
+def _parse_articles(annotations):
+    pass
+
 
 def _analyze(article, real_disaster, real_location, real_date, real_reports):
     """
