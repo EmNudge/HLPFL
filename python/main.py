@@ -20,12 +20,6 @@ def analyze(article, data):
       data["article"]: The text content to analyze
     """
 
-    # ASSUMED INPUT
-    # data["disaster"], data["location"], data["date"], data["reports"]
-
-    # ASSUMED ARTICLE
-    # article["text"], article["url"]
-
     # const
     valid_categories = [
         "/Law & Government/Public Safety",
@@ -79,36 +73,22 @@ def analyze(article, data):
     for entity in entity_response.entities:
         _type = enums.Entity.Type(entity.type).name
 
-        # print(u"Entity Name: {}".format(entity.name))
-        # print(u"Entity type: {}".format(_type))
-        # print(u"Salience score: {}".format(entity.salience))
-
         if _type == "LOCATION":
             fz_score = fuzz.partial_ratio(entity.name.lower(), data["location"])
-            # print(u"mentions: {}".format(len(entity.mentions)))        
-            # print(u"fuzz score: {}".format(fz_score))
-            if fz_score > 70:
-                # print('------------- HIT -----------------')
+            if fz_score > 60:
                 hits += 1
                 sal += entity.salience * 0.5
                 valid_location = True
-            # for mention in entity.mentions:
-            #     print(u"Mention text: {}".format(mention.text.content))
-            #     print(u"Mention type: {}".format(enums.EntityMention.Type(mention.type).name))
         elif _type == "EVENT":
             fz_score = fuzz.partial_ratio(entity.name.lower(), data["disaster"])
-            # print("events")
-            # print(u"fuzz score: {}".format(fz_score))
-            if fz_score > 70:
-                # print('------------- HIT -----------------')
+            if fz_score > 60:
                 hits += 1
                 sal += entity.salience
                 valid_event = True
-            elif (fuzz.partial_ratio(entity.name.lower(), annotations) > 70):
+            elif (fuzz.partial_ratio(entity.name.lower(), annotations) > 60):
                 hits += 1
                 sal += entity.salience
         elif _type == "DATE":
-            # print("date")
             if (entity.metadata["month"] and entity.metadata["year"]):
                 if (month == 1 and int(entity.metadata["month"]) == 1 and (year == int(entity.metadata["year"]) or year == int(entity.metadata["year"])-1)):
                     valid_date=True
@@ -116,20 +96,13 @@ def analyze(article, data):
                     valid_date=True
         else:
             fz_score = fuzz.partial_ratio(entity.name.lower(), annotations)
-            # print("defualt")
-            # print(u"fuzz score: {}".format(fz_score))
             if fz_score > 80:
-                # print('------------- HIT -----------------')
                 hits += 1
                 sal += entity.salience * 0.75
-        # print()
-        
+    
     category_response = client.classify_text(document)
     for category in category_response.categories:
-        # print(u"Category name: {}".format(category.name))
-        # print(u"Confidence: {}".format(category.confidence))
         if category.name in valid_categories and category.confidence > 0.5:
-            # print('------------- category HIT -----------------')
             valid_category = True
             confidence += 1
     
@@ -142,6 +115,7 @@ def analyze(article, data):
     valid_score = score > 0.25
 
     print(score, valid_category, valid_location, valid_date, valid_event, valid_score)
+    return valid_score and valid_category and valid_location and valid_date and valid_event, score
 
 if __name__ == "__main__":
     with open("articles.json", 'r') as fi:
