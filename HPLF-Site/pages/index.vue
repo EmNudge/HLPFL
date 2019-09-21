@@ -9,7 +9,7 @@
     </div>
     <div class="buttons">
       <Button text="Help" />
-      <Button text="Get Help" />
+      <Button text="Get Help" href="/get-help" />
     </div>
   </div>
 </template>
