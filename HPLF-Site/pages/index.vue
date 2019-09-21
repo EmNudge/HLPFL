@@ -1,72 +1,70 @@
 <template>
   <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        HPLF-Site
-      </h1>
-      <h2 class="subtitle">
-        Big Red Hacks 2019
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+    <img src="~static/main_bg.jpg" alt="disaster">
+    <h1>HLPFL</h1>
+    <div class="tagline">
+      <p>Protect.</p>
+      <p>Prevent.</p>
+      <p>Persevere.</p>
+    </div>
+    <div class="buttons">
+      <Button text="Help" />
+      <Button text="Get Help" />
     </div>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+import Button from '~/components/Button.vue'
 
 export default {
   components: {
-    Logo
+    Button
   }
 }
 </script>
 
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
+<style lang="scss">
+  .container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    padding-top: 25vw;
+    padding-left: 30vw;
+    > * { position: relative; }
 
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    h1 {
+      position: absolute;
+      top: 50px;
+      left: 50px;
+    }
+    .tagline {
+      position: relative;
+      font-size: 4em;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 70px;
+    }
 
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      width: 200px;
 
-.links {
-  padding-top: 15px;
-}
+      > a:nth-child(1) {
+        position: relative;
+        left: -80px;
+      }
+      > a:nth-child(2) {
+        position: relative;
+        right: -80px;
+      }
+    }
+  }
 </style>
