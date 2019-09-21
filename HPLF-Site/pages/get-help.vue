@@ -28,7 +28,6 @@
 import VoiceInput from '~/components/VoiceInput.vue'
 import Messages from '~/components/Messages.vue'
 import recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
-import recognizeFile from 'watson-speech/speech-to-text/recognize-file';
 
 export default {
   data() {
@@ -56,10 +55,11 @@ export default {
       }
 
       this.isActive = true;
+
       const stream = recognizeMicrophone({
         token: this.token,
       });
-
+      return;
       if (this.stream) {
         this.stream.stop();
         this.stream.removeAllListeners();
@@ -77,10 +77,10 @@ export default {
     }
   },
   async asyncData({req}) {
-    const url = `${req.protocol}://${req.get('host')}`;
-    const jsonData = await fetch(url + '/api/v1/credentials');
-    const { serviceUrl, token } = await jsonData.json();
-    return { token }
+    // const url = `${req.protocol}://${req.get('host')}`;
+    // const jsonData = await fetch(url + '/api/v1/credentials');
+    // const { serviceUrl, token } = await jsonData.json();
+    // return { token }
   },
   computed: {
     botMsgs() {
