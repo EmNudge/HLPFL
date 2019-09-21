@@ -9,7 +9,12 @@
     <div class="messages">
 
     </div>
-    <VoiceInput :isActive="isActive" @click="() => isActive = !isActive" />
+    <div class="input-container">
+      <VoiceInput 
+        :isActive="isActive" 
+        @click="() => isActive = !isActive" 
+      />
+    </div>
   </div>
 </template>
 
@@ -56,5 +61,9 @@ header {
     text-align: center;
     border-radius: 50px;
   }
+}
+.input-container {
+  display: flex;
+  justify-content: center;
 }
 </style>
