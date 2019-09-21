@@ -1,18 +1,23 @@
 <template>
   <div>
     <header>
-      <h1>HLPFL</h1>
+      <h1><a href="/">HLPFL</a></h1>
     </header>
     <div class="msg-container">
       <div class="message">Speak Or Type To Get Help</div>
     </div>
     <div class="messages">
-
+      <Messages 
+        :userMsgs="userMsgs"
+        :botMsgs="botMsgs"
+      />
     </div>
     <div class="input-container">
       <VoiceInput 
+        v-model="userInput"
         :isActive="isActive" 
-        @click="() => isActive = !isActive" 
+        @click="handleMicClick" 
+        @submit="handleSubmit"
       />
     </div>
   </div>
@@ -20,15 +25,55 @@
 
 <script>
 import VoiceInput from '~/components/VoiceInput.vue'
+import Messages from '~/components/Messages.vue'
+import recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
+import recognizeFile from 'watson-speech/speech-to-text/recognize-file';
 
 export default {
   data() {
     return { 
+      userInput: '',
       isActive: false,
+      userMsgs: ['hello', 'goodbye'],
+      // watson state
+      model: 'en-US_BroadbandModel',
+      rawMessages: [],
+      formattedMessages: [],
+      stream: null,
+    }
+  },
+  methods: {
+    handleSubmit() {
+      this.userMsgs.push(this.userInput)
+      this.userInput = "";
+    },
+    handleMicClick() {
+      this.isActive = true;
+      recognizeMicrophone({
+        token: this.token,
+      })
+    }
+  },
+  async asyncData({req}) {
+    const url = `${req.protocol}://${req.get('host')}`;
+    console.log(url);
+    const jsonData = await fetch(url + '/api/v1/credentials');
+    const { serviceUrl, token } = await jsonData.json();
+    return { token }
+  },
+  computed: {
+    botMsgs() {
+      const msgs = this.userMsgs.map(msg => {
+        const arr = msg.split('');
+        arr.reverse();
+        return arr.join('');
+      });
+      return ['HI!', ...msgs];
     }
   },
   components: {
-    VoiceInput
+    VoiceInput,
+    Messages
   }
 }
 </script>
@@ -37,6 +82,10 @@ export default {
 header {
   h1 {
     font-size: 2.5em;
+    a {
+      color: white;
+      text-decoration: none;
+    }
   }
   background: #38905B;
   color: white;
@@ -65,5 +114,9 @@ header {
 .input-container {
   display: flex;
   justify-content: center;
+}
+.messages {
+  margin: 40px auto;
+  max-width: 400px;
 }
 </style>
