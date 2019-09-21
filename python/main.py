@@ -3,6 +3,13 @@ from fuzzywuzzy import fuzz
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
 
+
+def parse_input(real_disaster, real_location, real_date, real_reports):
+    real_disaster = real_disaster.lower()
+    real_location = real_location.lower()
+    real_date = real_date.split("-")
+    return real_disaster, real_location, real_date, real_reports
+
 def _analyze(article, real_disaster, real_location, real_date, real_reports):
     """
     Analyzing Entities in a String
@@ -11,56 +18,7 @@ def _analyze(article, real_disaster, real_location, real_date, real_reports):
       article: The text content to analyze
     """
 
-    # Init API client
-    client = language_v1.LanguageServiceClient()
-    hits = 0
-    score = 0
-
-    # Settings
-    type_ = enums.Document.Type.PLAIN_TEXT
-    language = "en"
-    document = {"content": article, "type": type_, "language": language}
-    encoding_type = enums.EncodingType.UTF8
-
-    # Get entity responses
-    months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
-
-    entity_response = client.analyze_entities(document, encoding_type=encoding_type)
-    for entity in entity_response.entities:
-        print(u"Entity Name: {}".format(entity.name))
-        print(u"Entity type: {}".format(enums.Entity.Type(entity.type).name))
-        print(u"Salience score: {}".format(entity.salience))
-
-
-        if enums.Entity.Type(entity.type).name == "LOCATION":
-            fz_score = fuzz.partial_ratio(entity.name.lower(), real_disaster.lower())
-            print(u"mentions: {}".format(len(entity.mentions)))        
-            print(u"fuzz score: {}".format(fz_score))
-            if fz_score > 0.8:
-                hits += 1
-                score += entity.salience
-            # for mention in entity.mentions:
-            #     print(u"Mention text: {}".format(mention.text.content))
-            #     print(u"Mention type: {}".format(enums.EntityMention.Type(mention.type).name))
-
-        if enums.Entity.Type(entity.type).name == "EVENT":
-            fz_score = fuzz.partial_ratio(entity.name.lower(), real_disaster.lower())
-            print("events")
-            print(u"fuzz score: {}".format(fz_score))
-            if fz_score > 0.8:
-                hits += 1
-                score += entity.salience
-
-        if enums.Entity.Type(entity.type).name == "DATE":
-            print("date")
-            for key, value in entity.metadata.items():
-                print(key, value, sep=":\t")
-
-        print()
-        print()
-    
-    print("\n"*10)
-
+    # Const
     valid_categories = [
         "/Law & Government/Public Safety",
         "/Law & Government",
@@ -72,7 +30,57 @@ def _analyze(article, real_disaster, real_location, real_date, real_reports):
         "/Sensitive Subjects"
     ]
 
-   
+    # Init API client
+    client = language_v1.LanguageServiceClient()
+    hits = 0
+    score = 0
+    sal = 0
+
+    # Settings
+    type_ = enums.Document.Type.PLAIN_TEXT
+    language = "en"
+    document = {"content": article, "type": type_, "language": language}
+    encoding_type = enums.EncodingType.UTF8
+
+    # Get entity responses
+    entity_response = client.analyze_entities(document, encoding_type=encoding_type)
+    for entity in entity_response.entities:
+        print(u"Entity Name: {}".format(entity.name))
+        print(u"Entity type: {}".format(enums.Entity.Type(entity.type).name))
+        print(u"Salience score: {}".format(entity.salience))
+
+
+        if enums.Entity.Type(entity.type).name == "LOCATION":
+            fz_score = fuzz.partial_ratio(entity.name.lower(), real_disaster.lower())
+            print(u"mentions: {}".format(len(entity.mentions)))        
+            print(u"fuzz score: {}".format(fz_score))
+            if fz_score > 60:
+                print('------------- category HIT -----------------')
+                hits += 1
+                sal += entity.salience
+            # for mention in entity.mentions:
+            #     print(u"Mention text: {}".format(mention.text.content))
+            #     print(u"Mention type: {}".format(enums.EntityMention.Type(mention.type).name))
+
+        if enums.Entity.Type(entity.type).name == "EVENT":
+            fz_score = fuzz.partial_ratio(entity.name.lower(), real_disaster.lower())
+            print("events")
+            print(u"fuzz score: {}".format(fz_score))
+            if fz_score > 60:
+                print('------------- category HIT -----------------')
+                hits += 1
+                sal += entity.salience
+
+        # if enums.Entity.Type(entity.type).name == "DATE":
+        #     print("date")
+        #     for key, value in entity.metadata.items():
+        #         if value in real_date
+        #         print(key, value, sep=":\t")
+
+        print()
+        print()
+    
+    print("\n"*4)
 
     category_response = client.classify_text(document)
     for category in category_response.categories:
@@ -84,6 +92,15 @@ def _analyze(article, real_disaster, real_location, real_date, real_reports):
         else:
             print('------------- category MISS -----------------')
             
+    print("\n"*4)
+
+    score += min(hits/len(article.split(" ")), 0.10) * 10
+    score += min(sal, 1.0)
+    score /= 2
+
+    print(hits, hits/len(article.split(" ")), sal, score)
+
+    return score > 0.2
 
 if __name__ == "__main__":
     article = """
@@ -107,7 +124,7 @@ if __name__ == "__main__":
     CNN's Leyla Santiago, Catherine E. Shoichet and Jason Kravarik contributed to this report.
     """
 
-    real_disaster = "hurricane"
+    real_disaster = "hurricane storm typhoon death toll "
     real_location = "puerto rico"
     real_date = "2018"
     real_reports = 5
