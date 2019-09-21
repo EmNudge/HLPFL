@@ -12,6 +12,7 @@
         :botMsgs="botMsgs"
       />
     </div>
+    {{msg}}
     <div class="input-container">
       <VoiceInput 
         v-model="userInput"
@@ -37,7 +38,7 @@ export default {
       userMsgs: ['hello', 'goodbye'],
       // watson state
       model: 'en-US_BroadbandModel',
-      rawMessages: [],
+      msg: '',
       formattedMessages: [],
       stream: null,
     }
@@ -48,15 +49,35 @@ export default {
       this.userInput = "";
     },
     handleMicClick() {
+      if (this.isActive) {
+        this.isActive = false;
+        if (this.stream) this.strean.stop();
+        return;
+      }
+
       this.isActive = true;
-      recognizeMicrophone({
+      const stream = recognizeMicrophone({
         token: this.token,
-      })
+      });
+
+      if (this.stream) {
+        this.stream.stop();
+        this.stream.removeAllListeners();
+        this.stream.recognizeStream.removeAllListeners();
+      }
+      this.stream = stream;
+
+      stream
+        .on('data', msg => this.msg += msg)
+        .on('end', () => {
+          if (this.stream) this.stream.stop();
+          this.isActive = false
+        })
+        .on('error', err => console.log(err));
     }
   },
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
-    console.log(url);
     const jsonData = await fetch(url + '/api/v1/credentials');
     const { serviceUrl, token } = await jsonData.json();
     return { token }
