@@ -1,33 +1,32 @@
+import json
 from fuzzywuzzy import fuzz
-
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
 
+def _parse(article, data):
+    for key, value in data.items():
+        if isinstance(value, str):
+            data[key] = value.lower()
+    for key, value in article.items():
+        if isinstance(value, str):
+            article[key] = value.lower()
+        
 
-# def _parse_input(annotations):
-#     annotations["di"]
-
-#     real_disaster = real_disaster.lower()
-#     annotations["location"] = annotations["location"].lower()
-#     annotations["date"] = annotations["date"].split("-")
-#     return real_disaster, annotations["location"], annotations["date"], annotations["reports"]
-
-# def _parse_annotations["article"]s(annotations):
-#     pass
-
-
-def _analyze(annotations):
+def analyze(article, data):
     """
     Analyzing Entities in a String
 
     Args:
-      annotations["article"]: The text content to analyze
+      data["article"]: The text content to analyze
     """
 
     # ASSUMED INPUT
-    # annotations["article"], annotations["disaster"], annotations["location"], annotations["date"], annotations["reports"], annotations["url"]
+    # data["disaster"], data["location"], data["date"], data["reports"]
 
-    # Const
+    # ASSUMED ARTICLE
+    # article["text"], article["url"]
+
+    # const
     valid_categories = [
         "/Law & Government/Public Safety",
         "/Law & Government",
@@ -39,7 +38,20 @@ def _analyze(annotations):
         "/Sensitive Subjects"
     ]
 
-    year, month, day = [int(a) for a in annotations["date"].split("-")]
+    valid_disasters = [
+        "hurricane",
+        "typhoon",
+        "earthquake",
+        "tornado",
+        "monsoon",
+        "flood",
+        "tsunami",
+        "drought",
+        "famine"
+    ]
+
+    annotations = "damage hurricane storm death toll rain flood dead casualty fatal hurricane damage waves sea danger warning"
+    year, month, day = [int(a) for a in data["date"].split("-")]
 
     # Init API client
     client = language_v1.LanguageServiceClient()
@@ -48,7 +60,10 @@ def _analyze(annotations):
     valid_location = False
     valid_date = False
     valid_event = False
+    valid_category = False
+    valid_score = False
 
+    confidence = 0
     hits = 0
     score = 0
     sal = 0
@@ -56,73 +71,80 @@ def _analyze(annotations):
     # Settings
     type_ = enums.Document.Type.PLAIN_TEXT
     language = "en"
-    document = {"content": annotations["article"], "type": type_, "language": language}
+    document = {"content": article["article"], "type": type_, "language": language}
     encoding_type = enums.EncodingType.UTF8
 
     # Get entity responses
     entity_response = client.analyze_entities(document, encoding_type=encoding_type)
     for entity in entity_response.entities:
-        print(u"Entity Name: {}".format(entity.name))
-        print(u"Entity type: {}".format(enums.Entity.Type(entity.type).name))
-        print(u"Salience score: {}".format(entity.salience))
+        _type = enums.Entity.Type(entity.type).name
 
+        # print(u"Entity Name: {}".format(entity.name))
+        # print(u"Entity type: {}".format(_type))
+        # print(u"Salience score: {}".format(entity.salience))
 
-        if enums.Entity.Type(entity.type).name == "LOCATION":
-            fz_score = fuzz.partial_ratio(entity.name.lower(), annotations["disaster"].lower())
-            print(u"mentions: {}".format(len(entity.mentions)))        
-            print(u"fuzz score: {}".format(fz_score))
-            if fz_score > 65:
-                print('------------- category HIT -----------------')
+        if _type == "LOCATION":
+            fz_score = fuzz.partial_ratio(entity.name.lower(), data["location"])
+            # print(u"mentions: {}".format(len(entity.mentions)))        
+            # print(u"fuzz score: {}".format(fz_score))
+            if fz_score > 70:
+                # print('------------- HIT -----------------')
                 hits += 1
-                sal += entity.salience
+                sal += entity.salience * 0.5
                 valid_location = True
             # for mention in entity.mentions:
             #     print(u"Mention text: {}".format(mention.text.content))
             #     print(u"Mention type: {}".format(enums.EntityMention.Type(mention.type).name))
-
-        if enums.Entity.Type(entity.type).name == "EVENT":
-            fz_score = fuzz.partial_ratio(entity.name.lower(), annotations["disaster"].lower())
-            print("events")
-            print(u"fuzz score: {}".format(fz_score))
-            if fz_score > 60:
-                print('------------- category HIT -----------------')
+        elif _type == "EVENT":
+            fz_score = fuzz.partial_ratio(entity.name.lower(), data["disaster"])
+            # print("events")
+            # print(u"fuzz score: {}".format(fz_score))
+            if fz_score > 70:
+                # print('------------- HIT -----------------')
                 hits += 1
                 sal += entity.salience
-
-        # if enums.Entity.Type(entity.type).name == "DATE":
-        #     print("date")
-        #     for key, value in entity.metadata.items():
-        #         if value in annotations["date"]
-        #         print(key, value, sep=":\t")
-
-        print()
-        print()
-    
-    print("\n"*4)
-
+                valid_event = True
+            elif (fuzz.partial_ratio(entity.name.lower(), annotations) > 70):
+                hits += 1
+                sal += entity.salience
+        elif _type == "DATE":
+            # print("date")
+            if (entity.metadata["month"] and entity.metadata["year"]):
+                if (month == 1 and int(entity.metadata["month"]) == 1 and (year == int(entity.metadata["year"]) or year == int(entity.metadata["year"])-1)):
+                    valid_date=True
+                elif (month == int(entity.metadata["month"]) or month == int(entity.metadata["month"])-1):
+                    valid_date=True
+        else:
+            fz_score = fuzz.partial_ratio(entity.name.lower(), annotations)
+            # print("defualt")
+            # print(u"fuzz score: {}".format(fz_score))
+            if fz_score > 80:
+                # print('------------- HIT -----------------')
+                hits += 1
+                sal += entity.salience * 0.75
+        # print()
+        
     category_response = client.classify_text(document)
     for category in category_response.categories:
-        print(u"Category name: {}".format(category.name))
-        print(u"Confidence: {}".format(category.confidence))
-        if category.name in valid_categories and category.confidence > 0.25:
-            hits += 1
-            print('------------- category HIT -----------------')
-        else:
-            print('------------- category MISS -----------------')
-            
-    print("\n"*4)
-
-    score += min(hits/len(annotations["article"].split(" ")), 0.10) * 10
+        # print(u"Category name: {}".format(category.name))
+        # print(u"Confidence: {}".format(category.confidence))
+        if category.name in valid_categories and category.confidence > 0.5:
+            # print('------------- category HIT -----------------')
+            valid_category = True
+            confidence += 1
+    
+    # Caluclate score
+    score += confidence / len(category_response.categories)
+    score += min(hits/len(data["article"].split(" ")), 0.10) * 10
     score += min(sal, 1.0)
-    score /= 2
+    score /= 3
 
-    print(hits, hits/len(annotations["article"].split(" ")), sal, score)
+    valid_score = score > 0.25
 
-    return score > 0.2
+    print(score, valid_category, valid_location, valid_date, valid_event, valid_score)
 
 if __name__ == "__main__":
-    with open("annotations["article"]s.json", 'r') as fi:
+    with open("articles.json", 'r') as fi:
         data = json.load(fi)
-    
-
-    _analyze(annotations["article"], annotations["disaster"], annotations["location"], annotations["date"], annotations["reports"])
+    for i,dat in enumerate(data):
+        analyze(dat,dat)
