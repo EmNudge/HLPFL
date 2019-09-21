@@ -4,6 +4,7 @@ chardet==3.0.4
 Click==7.0
 Flask==1.1.1
 Flask-Cors==3.0.8
+fuzzywuzzy==0.17.0
 google-api-core==1.14.2
 google-api-python-client==1.7.11
 google-auth==1.6.3
@@ -22,6 +23,7 @@ MarkupSafe==1.1.1
 protobuf==3.9.1
 pyasn1==0.4.7
 pyasn1-modules==0.2.6
+python-Levenshtein==0.12.0
 pytz==2019.2
 requests==2.22.0
 rsa==4.0
