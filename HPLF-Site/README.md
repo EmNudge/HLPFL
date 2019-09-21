@@ -1,6 +1,6 @@
 # HPLF-Site
 
-> Big Red Hacks 2019 site
+> Big Red Hacks 2019
 
 ## Build Setup
 

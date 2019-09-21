@@ -6,7 +6,7 @@
         HPLF-Site
       </h1>
       <h2 class="subtitle">
-        Big Red Hacks 2019 site
+        Big Red Hacks 2019
       </h2>
       <div class="links">
         <a

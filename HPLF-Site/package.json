@@ -1,7 +1,7 @@
 {
   "name": "HPLF-Site",
   "version": "1.0.0",
-  "description": "Big Red Hacks 2019 site",
+  "description": "Big Red Hacks 2019",
   "author": "Calvin, Saheed",
   "private": true,
   "scripts": {
@@ -14,8 +14,6 @@
     "nuxt": "^2.0.0",
     "cross-env": "^5.2.0",
     "express": "^4.16.4",
-    "bootstrap-vue": "^2.0.0-rc.11",
-    "bootstrap": "^4.1.3",
     "@nuxtjs/pwa": "^3.0.0-0"
   },
   "devDependencies": {
