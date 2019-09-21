@@ -1,4 +1,3 @@
-
 module.exports = {
   mode: 'universal',
   /*
@@ -49,5 +48,8 @@ module.exports = {
     */
     extend (config, ctx) {
     }
-  }
+  },
+  serverMiddleware: [
+    { path: '/api', handler: '~/api/index.js' },
+  ]
 }
