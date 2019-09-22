@@ -114,4 +114,4 @@ def analyze(info, article):
     # print("---------- result ----------")
     # print(score, valid_country, valid_event, valid_date, valid_score, valid_category)
 
-    return score, valid_country and valid_event and valid_date and valid_score and valid_category
+    return score, valid_country and valid_event and valid_score and valid_category
