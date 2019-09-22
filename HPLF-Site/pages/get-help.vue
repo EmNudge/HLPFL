@@ -63,8 +63,7 @@ export default {
       }).then(async res => {
         const message = await res.json();
         this.botMsgs.push(message.response);
-        
-        const convoEnd = this.botMsgs.some(msg => msg.includes("Your disaster has been verified please check the housing section for available homes."));
+        const convoEnd = this.botMsgs.some(msg => msg.includes("Your information is being verified."));
         if (convoEnd) this.handleChecker();
       })
     },
@@ -100,16 +99,17 @@ export default {
         .on('error', err => console.log(err));
     },
     handleChecker() {
-      const data = { event: '', location: '', date: '',}
-      for (const [index, msg] of this.botMsgs) {
+      const data = { event: '', location: '', date: '' }
+
+      for (const [index, msg] of this.botMsgs.entries()) {
         if (msg.includes("We would like to verify this disaster")) {
-          data.location = this.userMsgs[index - 1].toLowerCase();
+          data.location = this.userMsgs[index].toLowerCase();
         } else if (msg.includes("Your information is being verified.")) {
-          data.event = this.userMsgs[index - 1].toLowerCase();
+          data.event = this.userMsgs[index].toLowerCase();
         }
       }
       data.date = new Date().toISOString().split('T')[0]
-
+      console.log('data is ', data)
       fetch('https://hackathons-1569045593351.appspot.com/entry', {
         method: 'POST', 
         mode: 'cors',
@@ -121,10 +121,16 @@ export default {
         redirect: 'follow',
         referrer: 'no-referrer',
         body: JSON.stringify(data),
-      }).then(res => {
-        const data = res.json();
+      }).then(async res => {
+        const data = await res.json();
+        console.log('passed flask app and got ', data);
+
         if (!Object.entries(data).length) return;
-        firestoreDB.collection('disasters').doc().set(data)
+        try {
+          await firestoreDB.collection('disasters').doc().set(data)
+        } catch(err) {
+          console.error(err);
+        }
         console.log('DATA HATH BEEN SET')
       })
     },
