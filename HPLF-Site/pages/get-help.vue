@@ -78,7 +78,7 @@ export default {
   },
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
-    const jsonData = await fetch(url + '/api/v1/credentials');
+    const jsonData = await fetch(url + '/api/voice');
     const { serviceUrl, token } = await jsonData.json();
     return { token }
   },
