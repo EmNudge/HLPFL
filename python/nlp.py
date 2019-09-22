@@ -2,7 +2,6 @@ import json
 from fuzzywuzzy.fuzz import partial_ratio as pratio
 from google.cloud import language_v1
 from google.cloud.language_v1 import enums
-from articles import get_articles
 
 def analyze(info, article):
     # const
@@ -34,25 +33,25 @@ def analyze(info, article):
     # Init API client
     client = language_v1.LanguageServiceClient()
 
-    print("---------- title ----------")
-    print(article["title"])
-    print()
-    print("---------- body ----------")
-    print(article["body"])
-    print()
-    print("---------- analysis ---------")
+    # print("---------- title ----------")
+    # print(article["title"])
+    # print()
+    # print("---------- body ----------")
+    # print(article["body"])
+    # print()
+    # print("---------- analysis ---------")
 
     # vars
-    print("country:\t", info["location"], "   |||   ", article["country"], pratio(info["location"], article["country"]))
-    print("event:\t", info["event"], "   |||   ", article["event"], pratio(info["event"], article["event"]), "   |||   ", max([pratio(info["event"].lower(), vd) for vd in valid_disasters]) > 0.75)
-    print("date:\t", info["date"], "   |||   ", article["date"], "   |||   ", info["date"].split("-")[:2] == article["date"].split("-")[:2])
+    # print("country:\t", info["location"], "   |||   ", article["country"], pratio(info["location"], article["country"]))
+    # print("event:\t", info["event"], "   |||   ", article["event"], pratio(info["event"], article["event"]), "   |||   ", max([pratio(info["event"].lower(), vd) for vd in valid_disasters]) > 0.75)
+    # print("date:\t", info["date"], "   |||   ", article["date"], "   |||   ", info["date"].split("-")[:2] == article["date"].split("-")[:2])
 
     valid_country = pratio(info["location"], article["country"]) > 75
     valid_event = pratio(info["event"], article["event"]) > 75 or max([pratio(info["event"].lower(), vd) for vd in valid_disasters]) > 0.75
     valid_date = info["date"].split("-")[:2] == article["date"].split("-")[:2]
 
-    print()
-    print("---------- hits ----------")
+    # print()
+    # print("---------- hits ----------")
 
     # settings
     type_ = enums.Document.Type.PLAIN_TEXT
@@ -73,32 +72,32 @@ def analyze(info, article):
             if fz_score > 60:
                 hits += 1
                 score += entity.salience * 0.5
-                print("LOCATION:\t", entity.name, entity.salience*0.5)
+                # print("LOCATION:\t", entity.name, entity.salience*0.5)
         elif _type == "EVENT":
             fz_score = pratio(entity.name.lower(), article["event"])
             if fz_score > 60:
                 hits += 1
                 score += entity.salience
-                print("EVENT:\t", entity.name, entity.salience)
+                # print("EVENT:\t", entity.name, entity.salience)
             elif (pratio(entity.name.lower(), annotations) > 60):
                 hits += 1
                 score += entity.salience
-                print("EVENT_ANNON:\t", entity.name, entity.salience)
+                # print("EVENT_ANNON:\t", entity.name, entity.salience)
         else:
             fz_score = pratio(entity.name.lower(), annotations)
             if fz_score > 80:
                 hits += 1
                 score += entity.salience * 0.75
-                print("ANNOTATION:\t", entity.name, entity.salience*0.75)
+                # print("ANNOTATION:\t", entity.name, entity.salience*0.75)
 
-    print()
-    print("---------- categories ----------")
+    # print()
+    # print("---------- categories ----------")
     # category responses
     valid_category = False
     confidence = 0
     category_response = client.classify_text(document)
     for category in category_response.categories:
-        print(category.name, category.confidence, category.confidence > 0.5)
+        # print(category.name, category.confidence, category.confidence > 0.5)
         if category.name in valid_categories and category.confidence > 0.5:
             valid_category = True
             confidence += 1
@@ -111,50 +110,8 @@ def analyze(info, article):
 
     valid_score = score > 0.25
 
-    print()
-    print("---------- result ----------")
-    print(score, valid_country, valid_event, valid_date, valid_score, valid_category)
+    # print()
+    # print("---------- result ----------")
+    # print(score, valid_country, valid_event, valid_date, valid_score, valid_category)
 
     return score, valid_country and valid_event and valid_date and valid_score and valid_category
-
-def entry(info):
-    hit = {}
-    high = -1
-    articles = get_articles(info["event"])
-    for article in articles:
-        print()
-        print()
-        print()
-        print()
-        print()
-        print("########## ARTICLE ##########")
-        score, valid = analyze(info, article)
-        if valid and score > high:
-            hit = {
-                "event": info["event"],
-                "country": info["location"],
-                "summary": article["title"],
-                "url": article["url"],
-                "date": info["date"]
-            }
-
-    return hit
-
-
-def main():
-    info = {
-        "event": "hurricane hermine",
-        "location": "united states",
-        "date": "2016-09-22"
-    }
-
-    # info = {
-    #     "event": "lombok earthquake",
-    #     "location": "indonesia",
-    #     "date": "2018-08-12"
-    # }
-
-    return entry(info)
-
-if __name__ == "__main__":
-    print(json.dumps(main(), indent=2))
