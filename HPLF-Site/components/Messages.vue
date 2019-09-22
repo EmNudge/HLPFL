@@ -37,6 +37,9 @@ export default {
 <style lang="scss">
 .messages-container {
   font-size: 1.25em;
+  height: 300px;
+  overflow-y: scroll;
+  padding: 0 20px;
 
   > * {
     padding: 10px 0;

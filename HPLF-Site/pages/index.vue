@@ -1,70 +1,70 @@
 <template>
-  <div class="container">
-    <img src="~static/main_bg.jpg" alt="disaster">
-    <h1>HLPFL</h1>
-    <div class="tagline">
-      <p>Protect.</p>
-      <p>Prevent.</p>
-      <p>Persevere.</p>
-    </div>
+  <div class="help-page">
+    <header>
+      <h1>HLPFL</h1>
+      <div class="motto">
+        <h2>Protect.</h2>
+        <h2>Prevent.</h2>
+        <h2>Persevere.</h2>
+      </div>
+    </header>
     <div class="buttons">
-      <Button text="Help" />
-      <Button text="Get Help" href="/get-help" />
+      <Button text="Help" bgColor="#861717" href="/help-money" />
+      <Button text="Get Help" bgColor="#861717" href="/get-help" />
     </div>
   </div>
 </template>
 
 <script>
+import Header from '~/components/Header.vue'
 import Button from '~/components/Button.vue'
 
 export default {
   components: {
-    Button
+    Button,
+    Header,
   }
 }
 </script>
 
 <style lang="scss">
-  .container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    padding-top: 25vw;
-    padding-left: 30vw;
-    > * { position: relative; }
+  .help-page {
+    --theme-color: #923434;
+  }
 
-    img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-    }
+  header {
+    background: var(--theme-color);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 100px;
+
     h1 {
-      position: absolute;
-      top: 50px;
-      left: 50px;
-    }
-    .tagline {
-      position: relative;
+      text-align: center;
       font-size: 4em;
-      color: white;
-      font-weight: bold;
-      margin-bottom: 70px;
     }
-
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      width: 200px;
-
-      > a:nth-child(1) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .motto {
+      margin-top: 100px;
+      h2 {
+        font-size: 2em;
         position: relative;
-        left: -80px;
+        &:nth-child(1) { left: -100px; }
+        &:nth-child(3) { left: 100px; }
       }
-      > a:nth-child(2) {
-        position: relative;
-        right: -80px;
-      }
+    }
+  }
+
+  .buttons {
+    max-width: 300px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 40px;
+    > * {
+      margin: 20px;
     }
   }
 </style>
