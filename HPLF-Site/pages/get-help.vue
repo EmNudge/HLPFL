@@ -1,24 +1,18 @@
 <template>
   <div>
     <header>
-      <h1><a href="/">HLPFL</a></h1>
+      <h1>HLPFL</h1>
     </header>
     <div class="msg-container">
       <div class="message">Speak Or Type To Get Help</div>
     </div>
     <div class="messages">
-      <Messages 
-        :userMsgs="userMsgs"
-        :botMsgs="botMsgs"
-      />
+
     </div>
-    
     <div class="input-container">
       <VoiceInput 
-        v-model="userInput"
         :isActive="isActive" 
-        @click="handleMicClick" 
-        @submit="handleSubmit"
+        @click="() => isActive = !isActive" 
       />
     </div>
   </div>
@@ -26,55 +20,72 @@
 
 <script>
 import VoiceInput from '~/components/VoiceInput.vue'
-import Messages from '~/components/Messages.vue'
-import recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
 
 export default {
   data() {
     return { 
-      userInput: '',
       isActive: false,
-      userMsgs: ['hello', 'goodbye'],
-      // watson state
-      model: 'en-US_BroadbandModel',
-      msg: '',
-      formattedMessages: [],
-      stream: null,
     }
   },
-  methods: {
-    handleSubmit() {
-      this.userMsgs.push(this.userInput)
-      this.userInput = "";
-    },
-    handleMicClick() {
-      if (this.isActive) {
-        this.isActive = false;
-        if (this.stream) this.strean.stop();
-        return;
-      }
-
-      this.isActive = true;
-
-      const stream = recognizeMicrophone({
-        token: this.token,
-      });
+  methods:{
+   
+  handleMicClick() {
+    if (this.state.audioSource === 'mic') {
+      this.stopTranscription();
       return;
-      if (this.stream) {
-        this.stream.stop();
-        this.stream.removeAllListeners();
-        this.stream.recognizeStream.removeAllListeners();
-      }
-      this.stream = stream;
-
-      stream
-        .on('data', msg => this.msg += msg)
-        .on('end', () => {
-          if (this.stream) this.stream.stop();
-          this.isActive = false
-        })
-        .on('error', err => console.log(err));
     }
+    this.reset();
+    this.setState({ audioSource: 'mic' });
+
+    // The recognizeMicrophone() method is a helper method provided by the watson-speech package
+    // It sets up the microphone, converts and downsamples the audio, and then transcribes it
+    // over a WebSocket connection
+    // It also provides a number of optional features, some of which are enabled by default:
+    //  * enables object mode by default (options.objectMode)
+    //  * formats results (Capitals, periods, etc.) (options.format)
+    //  * outputs the text to a DOM element - not used in this demo because it doesn't play nice
+    // with react (options.outputElement)
+    //  * a few other things for backwards compatibility and sane defaults
+    // In addition to this, it passes other service-level options along to the RecognizeStream that
+    // manages the actual WebSocket connection.
+    this.handleStream(recognizeMicrophone(this.getRecognizeOptions()));
+  },
+
+  handleStream(stream) {
+    console.log(stream);
+    // cleanup old stream if appropriate
+    if (this.stream) {
+      this.stream.stop();
+      this.stream.removeAllListeners();
+      this.stream.recognizeStream.removeAllListeners();
+    }
+    this.stream = stream;
+    this.captureSettings();
+
+    // grab the formatted messages and also handle errors and such
+    stream.on('data', this.handleFormattedMessage).on('end', this.handleTranscriptEnd).on('error', this.handleError);
+
+    // when errors occur, the end event may not propagate through the helper streams.
+    // However, the recognizeStream should always fire a end and close events
+    stream.recognizeStream.on('end', () => {
+      if (this.state.error) {
+        this.handleTranscriptEnd();
+      }
+    });
+
+    // grab raw messages from the debugging events for display on the JSON tab
+    stream.recognizeStream
+      .on('message', (frame, json) => this.handleRawMessage({ sent: false, frame, json }))
+      .on('send-json', json => this.handleRawMessage({ sent: true, json }))
+      .once('send-data', () => this.handleRawMessage({
+        sent: true, binary: true, data: true, // discard the binary data to avoid waisting memory
+      }))
+      .on('close', (code, message) => this.handleRawMessage({ close: true, code, message }));
+
+    // ['open','close','finish','end','error', 'pipe'].forEach(e => {
+    //     stream.recognizeStream.on(e, console.log.bind(console, 'rs event: ', e));
+    //     stream.on(e, console.log.bind(console, 'stream event: ', e));
+    // });
   },
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
@@ -82,19 +93,28 @@ export default {
     const { serviceUrl, token } = await jsonData.json();
     return { token }
   },
-  computed: {
-    botMsgs() {
-      const msgs = this.userMsgs.map(msg => {
-        const arr = msg.split('');
-        arr.reverse();
-        return arr.join('');
-      });
-      return ['HI!', ...msgs];
-    }
+   handleFormattedMessage(msg) {
+    const { formattedMessages } = this.state;
+    this.setState({ formattedMessages: formattedMessages.concat(msg) });
+  },
+  handleTranscriptEnd() {
+    // note: this function will be called twice on a clean end,
+    // but may only be called once in the event of an error
+    this.setState({ audioSource: null });
+  },
+  componentDidMount() {
+    this.fetchToken();
+    // tokens expire after 60 minutes, so automatcally fetch a new one ever 50 minutes
+    // Not sure if this will work properly if a computer goes to sleep for > 50 minutes
+    // and then wakes back up
+    // react automatically binds the call to this
+    // eslint-disable-next-line
+    this.setState({ tokenInterval: setInterval(this.fetchToken, 50 * 60 * 1000) });
+  },
+
   },
   components: {
-    VoiceInput,
-    Messages
+    VoiceInput
   }
 }
 </script>
@@ -103,10 +123,6 @@ export default {
 header {
   h1 {
     font-size: 2.5em;
-    a {
-      color: white;
-      text-decoration: none;
-    }
   }
   background: #38905B;
   color: white;
@@ -135,9 +151,5 @@ header {
 .input-container {
   display: flex;
   justify-content: center;
-}
-.messages {
-  margin: 40px auto;
-  max-width: 400px;
 }
 </style>
