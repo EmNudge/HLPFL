@@ -16,8 +16,6 @@ routes.post('/', async (req, res) => {
     text: req.body.sentence // start conversation with empty message
   });
 
-
-
   // Send message to assistant.
   async function sendMessage(messageInput) {
     service.message({
@@ -34,8 +32,7 @@ routes.post('/', async (req, res) => {
     if (response.output.generic
     && response.output.generic.length > 0
     && response.output.generic[0].response_type === 'text') {
-      res.json({ response: response.output.generic[0].text })
-      console.log(response.output.generic[0].text);
+      res.json({ response: response.output.generic[0].text });
     }
       
     service.deleteSession({

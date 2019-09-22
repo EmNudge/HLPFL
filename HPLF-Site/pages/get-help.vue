@@ -28,6 +28,8 @@
 import VoiceInput from '~/components/VoiceInput.vue'
 import Messages from '~/components/Messages.vue'
 import recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
+import firestoreDB from '~/plugins/firebase'
+
 export default {
   data() {
     return { 
@@ -61,6 +63,9 @@ export default {
       }).then(async res => {
         const message = await res.json();
         this.botMsgs.push(message.response);
+        
+        const convoEnd = this.botMsgs.some(msg => msg.includes("Your disaster has been verified please check the housing section for available homes."));
+        if (convoEnd) this.handleChecker();
       })
     },
     handleMicClick() {
@@ -93,7 +98,37 @@ export default {
           this.isActive = false
         })
         .on('error', err => console.log(err));
-    }
+    },
+    handleChecker() {
+      const data = { event: '', location: '', date: '',}
+      for (const [index, msg] of this.botMsgs) {
+        if (msg.includes("We would like to verify this disaster")) {
+          data.location = this.userMsgs[index - 1].toLowerCase();
+        } else if (msg.includes("Your information is being verified.")) {
+          data.event = this.userMsgs[index - 1].toLowerCase();
+        }
+      }
+      data.date = new Date().toISOString().split('T')[0]
+
+      fetch('https://hackathons-1569045593351.appspot.com/entry', {
+        method: 'POST', 
+        mode: 'cors',
+        cache: 'no-cache', 
+        credentials: 'same-origin', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        redirect: 'follow',
+        referrer: 'no-referrer',
+        body: JSON.stringify(data),
+      }).then(res => {
+        const data = res.json();
+        if (!Object.entries(data).length) return;
+        firestoreDB.collection('disasters').doc().set(data)
+        console.log('DATA HATH BEEN SET')
+      })
+    },
+
   },
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
