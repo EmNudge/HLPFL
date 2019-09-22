@@ -1,70 +1,34 @@
 <template>
-  <div class="container">
-    <img src="~static/main_bg.jpg" alt="disaster">
-    <h1>HLPFL</h1>
-    <div class="tagline">
-      <p>Protect.</p>
-      <p>Prevent.</p>
-      <p>Persevere.</p>
-    </div>
-    <div class="buttons">
-      <Button text="Help" href="/help-money" />
-      <Button text="Get Help" href="/get-help" />
-    </div>
+  <div class="help-page">
+    <header>
+      <h1>Protect.</h1>
+      <h1>Prevent.</h1>
+      <h1>Persevere.</h1>
+    </header>
+    
   </div>
 </template>
 
 <script>
+import Header from '~/components/Header.vue'
 import Button from '~/components/Button.vue'
 
 export default {
   components: {
-    Button
+    Button,
+    Header,
   }
 }
 </script>
 
 <style lang="scss">
-  .container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    padding-top: 25vw;
-    padding-left: 30vw;
-    > * { position: relative; }
+  .help-page {
+    --theme-color: #923434;
+  }
 
-    img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-    }
-    h1 {
-      position: absolute;
-      top: 50px;
-      left: 50px;
-    }
-    .tagline {
-      position: relative;
-      font-size: 4em;
-      color: white;
-      font-weight: bold;
-      margin-bottom: 70px;
-    }
-
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      width: 200px;
-
-      > a:nth-child(1) {
-        position: relative;
-        left: -80px;
-      }
-      > a:nth-child(2) {
-        position: relative;
-        right: -80px;
-      }
-    }
+  header {
+    background: var(--theme-color);
+    display: flex;
+    flex-direction: column;
   }
 </style>

@@ -2,24 +2,24 @@
   <div class="help-page">
     <Header bgColor="var(--theme-color)" />
     <div class="svg-banner">
-      <h1>Donate</h1>
-      <TransferMoney />
+      <h1>Organizations</h1>
+      <Organizations />
     </div>
     <div class="donations">
       <section>
-        <h2>Donate Housing</h2>
-        <p>When it comes to disaster relief, a place to live and take shelter even temporarily can be invaluable.</p>
-        <Button text="Donate" bgColor="var(--theme-color)" />
+        <h2>Red Cross</h2>
+        <p>A humanitarian organization that provides emergency assistance, disaster relief, and disaster preparedness education throughout the United States.</p>
+        <Button text="Visit" bgColor="var(--theme-color)" />
       </section>
       <section>
-        <h2>Donate Money</h2>
-        <p>Money can be donated for food, essentials, hygeine, and resources. Truly necessary items and expendatures can always be dontated quickly by providing the money with which to buy them.</p>
-        <Button text="Donate" bgColor="var(--theme-color)" />
+        <h2>Miami Relief Org</h2>
+        <p>Local disaster relief organization providing shelter, food, and supplies for peoples and families affected by drastic conditions.</p>
+        <Button text="Visit" bgColor="var(--theme-color)" />
       </section>
       <section>
-        <h2>Donate Time</h2>
-        <p>If you’re unable to donate money or housing, perhaps you can reache someone else who can. Share this page on social media or in chats to help spread the cause.</p>
-        <Button text="Share" bgColor="var(--theme-color)" />
+        <h2>Gocinco of Oregon</h2>
+        <p>State wide humanitarian organizatiion with the interum disturbed inside furthering the movement of populous in order of a desctructive magnitude.</p>
+        <Button text="Visit" bgColor="var(--theme-color)" />
       </section>
     </div>
   </div>
@@ -28,27 +28,27 @@
 <script>
 import Header from '~/components/Header.vue'
 import Button from '~/components/Button.vue'
-import TransferMoney from '~/components/SVGs/TransferMoney.vue';
+import Organizations from '~/components/SVGs/Organizations.vue';
 
 export default {
   components: {
     Button,
     Header,
-    TransferMoney,
+    Organizations,
   }
 }
 </script>
 
 <style lang="scss">
   .help-page {
-    --theme-color: #257BFC;
+    --theme-color: #FCB325;
   }
   .svg-banner {
     text-align: center;
     margin-top: -400px;
     h1 {
       position: relative;
-      left: -300px;
+      left: -150px;
       color: white;
       font-size: 4.5em;
       margin-bottom: -20px;

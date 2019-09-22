@@ -2,8 +2,8 @@
   <div class="help-page">
     <Header bgColor="var(--theme-color)" />
     <div class="svg-banner">
-      <h1>Donate</h1>
-      <TransferMoney />
+      <h1>Disasters</h1>
+      <Wheatherman />
     </div>
     <div class="donations">
       <section>
@@ -28,27 +28,27 @@
 <script>
 import Header from '~/components/Header.vue'
 import Button from '~/components/Button.vue'
-import TransferMoney from '~/components/SVGs/TransferMoney.vue';
+import Wheatherman from '~/components/SVGs/Wheatherman.vue';
 
 export default {
   components: {
     Button,
     Header,
-    TransferMoney,
+    Wheatherman,
   }
 }
 </script>
 
 <style lang="scss">
   .help-page {
-    --theme-color: #257BFC;
+    --theme-color: #FC5825;
   }
   .svg-banner {
     text-align: center;
     margin-top: -400px;
     h1 {
       position: relative;
-      left: -300px;
+      left: -250px;
       color: white;
       font-size: 4.5em;
       margin-bottom: -20px;
