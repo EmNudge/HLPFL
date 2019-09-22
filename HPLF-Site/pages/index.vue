@@ -1,11 +1,17 @@
 <template>
   <div class="help-page">
     <header>
-      <h1>Protect.</h1>
-      <h1>Prevent.</h1>
-      <h1>Persevere.</h1>
+      <h1>HLPFL</h1>
+      <div class="motto">
+        <h2>Protect.</h2>
+        <h2>Prevent.</h2>
+        <h2>Persevere.</h2>
+      </div>
     </header>
-    
+    <div class="buttons">
+      <Button text="Help" bgColor="#861717" href="/help-money" />
+      <Button text="Get Help" bgColor="#861717" href="/get-help" />
+    </div>
   </div>
 </template>
 
@@ -30,5 +36,35 @@ export default {
     background: var(--theme-color);
     display: flex;
     flex-direction: column;
+    padding-bottom: 100px;
+
+    h1 {
+      text-align: center;
+      font-size: 4em;
+    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .motto {
+      margin-top: 100px;
+      h2 {
+        font-size: 2em;
+        position: relative;
+        &:nth-child(1) { left: -100px; }
+        &:nth-child(3) { left: 100px; }
+      }
+    }
+  }
+
+  .buttons {
+    max-width: 300px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 40px;
+    > * {
+      margin: 20px;
+    }
   }
 </style>
