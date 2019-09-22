@@ -38,20 +38,16 @@ def analyze(info, article):
     # print()
     # print("---------- body ----------")
     # print(article["body"])
-    # print()
-    # print("---------- analysis ---------")
 
     # vars
-    # print("country:\t", info["location"], "   |||   ", article["country"], pratio(info["location"], article["country"]))
-    # print("event:\t", info["event"], "   |||   ", article["event"], pratio(info["event"], article["event"]), "   |||   ", max([pratio(info["event"].lower(), vd) for vd in valid_disasters]) > 0.75)
-    # print("date:\t", info["date"], "   |||   ", article["date"], "   |||   ", info["date"].split("-")[:2] == article["date"].split("-")[:2])
-
     valid_country = pratio(info["location"], article["country"]) > 75
     valid_event = pratio(info["event"], article["event"]) > 75 or max([pratio(info["event"].lower(), vd) for vd in valid_disasters]) > 0.75
     valid_date = info["date"].split("-")[:2] == article["date"].split("-")[:2]
-
-    # print()
-    # print("---------- hits ----------")
+    #  print()
+    # print("---------- analysis ---------")
+    # print("country:\t", info["location"], "   |||   ", article["country"], pratio(info["location"], article["country"]))
+    # print("event:\t", info["event"], "   |||   ", article["event"], pratio(info["event"], article["event"]), "   |||   ", max([pratio(info["event"].lower(), vd) for vd in valid_disasters]) > 0.75)
+    # print("date:\t", info["date"], "   |||   ", article["date"], "   |||   ", info["date"].split("-")[:2] == article["date"].split("-")[:2])
 
     # settings
     type_ = enums.Document.Type.PLAIN_TEXT
@@ -59,6 +55,10 @@ def analyze(info, article):
     document = {"content": article["title"] + ". " + article["body"], "type": type_, "language": language}
     encoding_type = enums.EncodingType.UTF8
 
+
+    # print()
+    # print("---------- hits ----------")
+    
     # entity responses
     valid_score = False
     hits = 0

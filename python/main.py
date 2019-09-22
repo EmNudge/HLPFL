@@ -14,12 +14,7 @@ def entry():
     high = -1
     articles = get_articles(info["event"])
     for article in articles:
-        # print()
-        # print()
-        # print()
-        # print()
-        # print()
-        # print("########## ARTICLE ##########")
+        # print("\n"*4, "########## ARTICLE ##########")
         score, valid = analyze(info, article)
         if valid and score > high:
             response = {
@@ -32,18 +27,3 @@ def entry():
 
     print(response)
     return jsonify(response)
-
-
-# info = {
-#     "event": "hurricane hermine",
-#     "location": "united states",
-#     "date": "2016-09-22"
-# }
-
-# info = {
-#     "event": "lombok earthquake",
-#     "location": "indonesia",
-#     "date": "2018-08-12"
-# }
-
-{"event": "lombok earthquake","location": "indonesia","date": "2018-08-12"}
