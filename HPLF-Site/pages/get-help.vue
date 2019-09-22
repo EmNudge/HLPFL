@@ -36,7 +36,6 @@ export default {
       userMsgs: ['hello', 'goodbye'],
       // watson state
       model: 'en-US_BroadbandModel',
-      msg: '',
       formattedMessages: [],
       stream: null,
     }
@@ -48,23 +47,29 @@ export default {
     },
     handleMicClick() {
       if (this.isActive) {
+        setTimeout(this.handleSubmit, 500);
         this.isActive = false;
-        if (this.stream) this.strean.stop();
+        if (this.stream) this.stream.stop();
         return;
       }
+
       this.isActive = true;
       const { access_token } = this;
       const stream = recognizeMicrophone({ access_token });
-      return;
-      
+
       if (this.stream) {
         this.stream.stop();
         this.stream.removeAllListeners();
         this.stream.recognizeStream.removeAllListeners();
       }
+      
       this.stream = stream;
+
       stream
-        .on('data', msg => this.msg += msg)
+        .on('data', msg => {
+          console.log('GETTING DATA')
+          this.userInput += msg
+        })
         .on('end', () => {
           if (this.stream) this.stream.stop();
           this.isActive = false
