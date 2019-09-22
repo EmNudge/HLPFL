@@ -33,7 +33,8 @@ export default {
     return { 
       userInput: '',
       isActive: false,
-      userMsgs: ['hello', 'goodbye'],
+      userMsgs: [''],
+      botMsgs: ['Hello. How may I be of service?'],
       // watson state
       model: 'en-US_BroadbandModel',
       formattedMessages: [],
@@ -42,8 +43,25 @@ export default {
   },
   methods: {
     handleSubmit() {
-      this.userMsgs.push(this.userInput)
+      this.userMsgs.push(this.userInput);
+      const sentence = this.userInput;
       this.userInput = "";
+
+      fetch(this.url + '/api/chat', {
+        method: 'POST', 
+        mode: 'cors',
+        cache: 'no-cache', 
+        credentials: 'same-origin', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        redirect: 'follow',
+        referrer: 'no-referrer',
+        body: JSON.stringify({sentence}),
+      }).then(async res => {
+        const message = await res.json();
+        this.botMsgs.push(message.response);
+      })
     },
     handleMicClick() {
       if (this.isActive) {
@@ -81,17 +99,7 @@ export default {
     const url = `${req.protocol}://${req.get('host')}`;
     const jsonData = await fetch(url + '/api/voice');
     const { serviceUrl, access_token } = await jsonData.json();
-    return { access_token }
-  },
-  computed: {
-    botMsgs() {
-      const msgs = this.userMsgs.map(msg => {
-        const arr = msg.split('');
-        arr.reverse();
-        return arr.join('');
-      });
-      return ['HI!', ...msgs];
-    }
+    return { access_token, url }
   },
   components: {
     VoiceInput,

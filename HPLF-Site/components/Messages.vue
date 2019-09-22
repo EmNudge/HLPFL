@@ -23,9 +23,9 @@ export default {
   computed: {
     messages() {
       const newMsgs = [];
-      for (const [index, msg] of this.botMsgs.entries()) {
+      for (const [index, msg] of this.userMsgs.entries()) {
         if (msg) newMsgs.push({msg, type: 'bot'});
-        const userMsg = this.userMsgs[index];
+        const userMsg = this.botMsgs[index];
         if (userMsg) newMsgs.push({msg: userMsg, type: 'user'});
       }
       return newMsgs;
@@ -47,10 +47,10 @@ export default {
   
   .bot-message {
     color: green;
-    text-align: left;
+    text-align: right;
   }
   .user-message {
-    text-align: right;
+    text-align: left;
   }
 }
 </style>
