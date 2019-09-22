@@ -11,6 +11,8 @@ venv
 
 # Logs
 log.txt
+log.json
+log1.json
 
 # GCloud
 credentials.json
