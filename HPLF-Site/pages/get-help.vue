@@ -53,10 +53,10 @@ export default {
         return;
       }
       this.isActive = true;
-      const stream = recognizeMicrophone({
-        token: this.token,
-      });
+      const { access_token } = this;
+      const stream = recognizeMicrophone({ access_token });
       return;
+      
       if (this.stream) {
         this.stream.stop();
         this.stream.removeAllListeners();
@@ -74,9 +74,9 @@ export default {
   },
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
-    const jsonData = await fetch(url + '/api/v1/credentials');
-    const { serviceUrl, token } = await jsonData.json();
-    return { token }
+    const jsonData = await fetch(url + '/api/voice');
+    const { serviceUrl, access_token } = await jsonData.json();
+    return { access_token }
   },
   computed: {
     botMsgs() {
