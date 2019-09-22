@@ -12,7 +12,7 @@
         :botMsgs="botMsgs"
       />
     </div>
-    
+    {{msg}}
     <div class="input-container">
       <VoiceInput 
         v-model="userInput"
@@ -50,16 +50,15 @@ export default {
     handleMicClick() {
       if (this.isActive) {
         this.isActive = false;
-        if (this.stream) this.strean.stop();
+        if (this.stream) this.stream.stop();
         return;
       }
 
       this.isActive = true;
+      const {access_token} = this;
+      const stream = recognizeMicrophone({ access_token });
 
-      const stream = recognizeMicrophone({
-        token: this.token,
-      });
-      return;
+
       if (this.stream) {
         this.stream.stop();
         this.stream.removeAllListeners();
@@ -79,8 +78,8 @@ export default {
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
     const jsonData = await fetch(url + '/api/voice');
-    const { serviceUrl, token } = await jsonData.json();
-    return { token }
+    const { serviceUrl, access_token } = await jsonData.json();
+    return { access_token }
   },
   computed: {
     botMsgs() {
