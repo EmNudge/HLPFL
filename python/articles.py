@@ -13,7 +13,6 @@ def get_articles(event):
             data.append(get_article_data(link))
         except KeyError:
             pass
-        print(data[-1])
 
     return data
 

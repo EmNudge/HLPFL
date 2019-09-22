@@ -12,7 +12,7 @@
         :botMsgs="botMsgs"
       />
     </div>
-    {{msg}}
+    
     <div class="input-container">
       <VoiceInput 
         v-model="userInput"
@@ -28,7 +28,6 @@
 import VoiceInput from '~/components/VoiceInput.vue'
 import Messages from '~/components/Messages.vue'
 import recognizeMicrophone from 'watson-speech/speech-to-text/recognize-microphone';
-
 export default {
   data() {
     return { 
@@ -50,22 +49,20 @@ export default {
     handleMicClick() {
       if (this.isActive) {
         this.isActive = false;
-        if (this.stream) this.stream.stop();
+        if (this.stream) this.strean.stop();
         return;
       }
-
       this.isActive = true;
-      const {access_token} = this;
-      const stream = recognizeMicrophone({ access_token });
-
-
+      const stream = recognizeMicrophone({
+        token: this.token,
+      });
+      return;
       if (this.stream) {
         this.stream.stop();
         this.stream.removeAllListeners();
         this.stream.recognizeStream.removeAllListeners();
       }
       this.stream = stream;
-
       stream
         .on('data', msg => this.msg += msg)
         .on('end', () => {
@@ -77,9 +74,9 @@ export default {
   },
   async asyncData({req}) {
     const url = `${req.protocol}://${req.get('host')}`;
-    const jsonData = await fetch(url + '/api/voice');
-    const { serviceUrl, access_token } = await jsonData.json();
-    return { access_token }
+    const jsonData = await fetch(url + '/api/v1/credentials');
+    const { serviceUrl, token } = await jsonData.json();
+    return { token }
   },
   computed: {
     botMsgs() {

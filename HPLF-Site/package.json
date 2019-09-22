@@ -19,6 +19,7 @@
     "firebase": "^6.6.2",
     "ibm-watson": "^4.5.1",
     "nuxt": "^2.0.0",
+    "prompt-sync": "^4.1.7",
     "watson-speech": "^0.36.6"
   },
   "devDependencies": {
