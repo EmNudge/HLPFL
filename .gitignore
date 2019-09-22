@@ -16,3 +16,4 @@ log1.json
 
 # GCloud
 credentials.json
+node_modules
