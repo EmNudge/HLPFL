@@ -6,20 +6,11 @@
       <Wheatherman />
     </div>
     <div class="donations">
-      <section>
-        <h2>Donate Housing</h2>
-        <p>When it comes to disaster relief, a place to live and take shelter even temporarily can be invaluable.</p>
-        <Button text="Donate" bgColor="var(--theme-color)" />
-      </section>
-      <section>
-        <h2>Donate Money</h2>
-        <p>Money can be donated for food, essentials, hygeine, and resources. Truly necessary items and expendatures can always be dontated quickly by providing the money with which to buy them.</p>
-        <Button text="Donate" bgColor="var(--theme-color)" />
-      </section>
-      <section>
-        <h2>Donate Time</h2>
-        <p>If you’re unable to donate money or housing, perhaps you can reache someone else who can. Share this page on social media or in chats to help spread the cause.</p>
-        <Button text="Share" bgColor="var(--theme-color)" />
+      <section v-for="disaster in disasters" :key="disaster.summary">
+        <h2>{{disaster.event}} - {{disaster.location}}</h2>
+        <a :href="disaster.url" class="small">{{disaster.url}}</a>
+        <p>{{disaster.summary}}</p>
+        <Button text="View Article" :href="disaster.url" bgColor="var(--theme-color)" />
       </section>
     </div>
   </div>
@@ -29,8 +20,17 @@
 import Header from '~/components/Header.vue'
 import Button from '~/components/Button.vue'
 import Wheatherman from '~/components/SVGs/Wheatherman.vue';
+import firestoreDB from '~/plugins/firebase';
 
 export default {
+  async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
+    const disasters = await firestoreDB.collection("disasters").get();
+    const distatersData = [];
+    disasters.forEach(disaster => distatersData.push(disaster.data()))
+    distatersData.sort((a, b) => a.count - b.count);
+
+    return { disasters: distatersData }
+  },
   components: {
     Button,
     Header,
@@ -62,8 +62,16 @@ export default {
       margin: 60px 20px;
       h2 {
         font-size: 3em;
-        margin-bottom: 15px;
+        margin-bottom: 5px;
         color: var(--theme-color);
+      }
+      a.small {
+        font-size: .6em;
+        margin-top: -6px;
+        margin-bottom: 20px;
+        display: block;
+        text-decoration: none;
+        color: black;
       }
       p {
         margin-bottom: 20px;

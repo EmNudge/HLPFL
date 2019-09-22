@@ -9,17 +9,17 @@
       <section>
         <h2>Red Cross</h2>
         <p>A humanitarian organization that provides emergency assistance, disaster relief, and disaster preparedness education throughout the United States.</p>
-        <Button text="Visit" bgColor="var(--theme-color)" />
+        <Button text="Visit" bgColor="var(--theme-color)"   href="https://www.redcross.org"/>
       </section>
       <section>
-        <h2>Miami Relief Org</h2>
-        <p>Local disaster relief organization providing shelter, food, and supplies for peoples and families affected by drastic conditions.</p>
-        <Button text="Visit" bgColor="var(--theme-color)" />
+        <h2>Direct relief</h2>
+        <p>California’s largest international humanitarian nonprofit organization. The organization provides medical assistance to improve the health and lives of people affected by poverty and disaster, both in the United States and throughout the world.</p>
+        <Button text="Visit" bgColor="var(--theme-color)" href="https://www.directrelief.org"/>
       </section>
       <section>
-        <h2>Gocinco of Oregon</h2>
-        <p>State wide humanitarian organizatiion with the interum disturbed inside furthering the movement of populous in order of a desctructive magnitude.</p>
-        <Button text="Visit" bgColor="var(--theme-color)" />
+        <h2>Coalition for The Homeless</h2>
+        <p>Nation's oldest advocacy and direct service organization helping homeless men, women & children; believes that affordable housing, sufficient food, and the chance to work for a living wage are fundamental rights in a civilized society.</p>
+        <Button text="Visit" bgColor="var(--theme-color)" href="https://www.coalitionforthehomeless.org"/>
       </section>
     </div>
   </div>
@@ -35,7 +35,8 @@ export default {
     Button,
     Header,
     Organizations,
-  }
+  }, 
+ 
 }
 </script>
 
